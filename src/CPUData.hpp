@@ -161,4 +161,49 @@ static void printBinary1(uint16_t num)
     vprint("\n");
 }
 
+static const char* getRegister(uint8_t currentByte, bool is16BitWide, uint8_t registerMask) 
+{
+    if (registerMask == 0b00111000)
+    {
+        uint8_t registerIndex = (currentByte & registerMask) >> 3;
+        return registerTable[is16BitWide][registerIndex];
+    }
+    else if (registerMask == 0b00000111)
+    {
+        uint8_t registerIndex = (currentByte & registerMask);
+        return registerTable[is16BitWide][registerIndex];
+    }
+    return "Invalid mask";
+}
+
+static uint16_t get16BitDisplacement(const char* const data, uint32_t& currentByte) 
+{
+    uint16_t lowDisplacementMask = 0b0000000011111111;
+    currentByte++;
+    uint16_t lowDisplacement = data[currentByte] & lowDisplacementMask;
+    currentByte++;
+    uint16_t highDisplacement = data[currentByte];
+
+    highDisplacement = highDisplacement << 8;
+    return lowDisplacement | highDisplacement;
+}
+
+static uint16_t get16BitValue(const char* const data, uint32_t& currentByte)
+{
+    uint16_t lowValueMask = 0b0000000011111111;
+    uint16_t lowValue = data[currentByte] & lowValueMask;
+    currentByte++;
+    uint16_t highValue = data[currentByte];
+
+    highValue = highValue << 8;
+    return lowValue | highValue;
+}
+
+static const char* getEffectiveAddressCalculation(uint8_t byte)
+{
+    uint8_t rmMask = 0b00000111;
+    uint8_t rm = rmMask & byte;
+    return effectiveAddressCalculations[rm];
+}
+
 #endif // !CPU_DATA_HDR

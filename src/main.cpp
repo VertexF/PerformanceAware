@@ -18,6 +18,7 @@ int main()
 
     HeapAllocator* allocator = &MemoryService::instance()->systemAllocator;
     StackAllocator scratchAllocator = MemoryService::instance()->scratchAllocator;
+    //FileReadResult fileInput = fileReadBinary(BaseFilePath"\\computer_enhance\\perfaware\\part1\\listing_0039_more_movs", &scratchAllocator);
     FileReadResult fileInput = fileReadBinary(BaseFilePath"\\computer_enhance\\perfaware\\part1\\listing_0040_challenge_movs", &scratchAllocator);
     char* data = fileInput.data;
 
@@ -47,6 +48,7 @@ int main()
         case MOV:
             if (handleMoveInstruction(test1.move, data, instructionStringBuffer, currentByte))
             {
+                currentByte++;
                 continue;
             }
             break;
