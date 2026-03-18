@@ -134,6 +134,13 @@ void fileWriteBinary(const char* filename, void* memory, size_t size)
     fclose(file);
 }
 
+void fileWriteText(const char* filename, const char* memory, size_t size)
+{
+    FILE* file = fopen(filename, "w");
+    fwrite(memory, size, 1, file);
+    fclose(file);
+}
+
 bool fileExists(const char* path)
 {
 #if defined(_WIN64)

@@ -15,8 +15,13 @@ set(RAPID_HASH_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vender/rapidhash")
 set(VENDER_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/vender")
 #Set the location of the engine source.
 set(SRC_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(PART1_HOMEWORK_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/computer_enhance/perfaware/part1")
 
-set(HOMEWORK_SOURCE src/main.cpp)
+set(HOMEWORK_SOURCE src/main.cpp src/CPUData.hpp
+src/GroupInstructions.hpp
+src/GroupInstructions.cpp
+src/MoveInstruction.hpp
+src/MoveInstruction.cpp)
 
 add_executable(Homework ${HOMEWORK_SOURCE})
 
@@ -32,7 +37,9 @@ target_include_directories(Homework SYSTEM PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}
                                                ${RAPID_HASH_DIR}
                                                ${TLSF_INCLUDE_DIR}
                                                ${VENDER_INCLUDE}
-                                               ${CGLTF_INCLUDE})
+                                               ${PART1_HOMEWORK_INCLUDE})
+
+target_compile_definitions(Homework PUBLIC BaseFilePath="${CMAKE_CURRENT_SOURCE_DIR}")
 
 set(FOUNDATION_SOURCE src/Foundation/Array.hpp
                       src/Foundation/Assert.hpp
