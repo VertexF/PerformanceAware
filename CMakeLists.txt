@@ -21,7 +21,15 @@ set(HOMEWORK_SOURCE src/main.cpp src/CPUData.hpp
 src/GroupInstructions.hpp
 src/GroupInstructions.cpp
 src/MoveInstruction.hpp
-src/MoveInstruction.cpp)
+src/MoveInstruction.cpp
+src/AddInstruction.hpp
+src/AddInstruction.cpp
+src/SubInstruction.hpp
+src/SubInstruction.cpp
+src/CmpInstruction.hpp
+src/CmpInstruction.cpp
+src/JnzInstruction.hpp
+src/JnzInstruction.cpp)
 
 add_executable(Homework ${HOMEWORK_SOURCE})
 

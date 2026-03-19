@@ -8,6 +8,10 @@
  
 #include "CPUData.hpp"
 #include "MoveInstruction.hpp"
+#include "AddInstruction.hpp"
+#include "SubInstruction.hpp"
+#include "CmpInstruction.hpp"
+#include "JnzInstruction.hpp"
 #include "GroupInstructions.hpp"
 
 int main() 
@@ -18,8 +22,8 @@ int main()
 
     HeapAllocator* allocator = &MemoryService::instance()->systemAllocator;
     StackAllocator scratchAllocator = MemoryService::instance()->scratchAllocator;
-    //FileReadResult fileInput = fileReadBinary(BaseFilePath"\\computer_enhance\\perfaware\\part1\\listing_0039_more_movs", &scratchAllocator);
-    FileReadResult fileInput = fileReadBinary(BaseFilePath"\\computer_enhance\\perfaware\\part1\\listing_0040_challenge_movs", &scratchAllocator);
+    FileReadResult fileInput = fileReadBinary("C:\\Users\\Unga\\Documents\\nasmTest", &scratchAllocator);
+    //FileReadResult fileInput = fileReadBinary(BaseFilePath"\\computer_enhance\\perfaware\\part1\\listing_0041_add_sub_cmp_jnz", &scratchAllocator);
     char* data = fileInput.data;
 
     uint32_t currentByte = 0;
@@ -35,7 +39,15 @@ int main()
 
     while (currentByte < fileInput.size)
     {
-        groupInstructions(test1, data[currentByte]);
+        //This is the program counter being print for every instruction.
+        vprint("0x%x ", currentByte);
+        if (handleJnzInstruction(data, instructionStringBuffer, currentByte)) 
+        {
+            currentByte++;
+            continue;
+        }
+
+        groupInstructions(test1, data, currentByte);
 
         currentByte++;
 
@@ -47,6 +59,27 @@ int main()
             break;
         case MOV:
             if (handleMoveInstruction(test1.move, data, instructionStringBuffer, currentByte))
+            {
+                currentByte++;
+                continue;
+            }
+            break;
+        case ADD:
+            if (handleAddInstruction(test1.add, data, instructionStringBuffer, currentByte))
+            {
+                currentByte++;
+                continue;
+            }
+            break;
+        case SUB:
+            if (handleSubInstruction(test1.sub, data, instructionStringBuffer, currentByte))
+            {
+                currentByte++;
+                continue;
+            }
+            break;
+        case CMP:
+            if (handleCmpInstruction(test1.cmp, data, instructionStringBuffer, currentByte))
             {
                 currentByte++;
                 continue;

@@ -3,6 +3,6 @@
 
 #include "CPUData.hpp"
 
-void groupInstructions(OpCodes& opcode, uint8_t byte);
+void groupInstructions(OpCodes& opcode, const char* const data, uint32_t currentByte);
 
 #endif // !GROUP_INSTRUCTIONS_HDR

@@ -3,10 +3,13 @@
 
 #include <Foundation/Log.hpp>
 
-static constexpr uint32_t instructionsTotal = 2;
+static constexpr uint32_t instructionsTotal = 5;
 
 static constexpr uint32_t moveInstructionsTotal = 7;
 static constexpr uint32_t pushInstructionsTotal = 3;
+static constexpr uint32_t addInstructionsTotal = 3;
+static constexpr uint32_t subInstructionsTotal = 3;
+static constexpr uint32_t cmpInstructionsTotal = 3;
 
 //NOTE - We have information here about the instructions being tested because we are seperated them into arrays.
 //This reduces the complexity of searching through instructions, because if we are in say 'pushInstructions' and we find the first byte is 11111111 
@@ -109,11 +112,110 @@ struct Push
     };
 };
 
+struct Add 
+{
+    const char* instructionName = "add";
+    uint8_t reg;
+    bool d;
+    bool w; //use wide registers or/and wide data.
+    bool s; //sign extend to 8bit to 16bit if w = 1
+
+    enum AddInstructionsType : uint8_t
+    {
+        REG_MEMORY_WITH_TO_EITHER = 0b00000000, //Reg/memory with either register to either - 2pad
+        IMMIDATE_TO_REG_MEMORY =    0b10000000, //immediate to register - 2pad
+        IMMIDATE_TO_ACCUMULATOR =   0b00000100, //immediate to acculator - 1pad
+    };
+
+    AddInstructionsType types;
+
+    static constexpr uint8_t addInstructionsMask[addInstructionsTotal]
+    {
+        0b11111100, //Reg/memory with either register to either - 2pad
+        0b11111100, //immediate to register - 2pad
+        0b11111110, //immediate to acculator - 1pad
+    };
+
+    static constexpr uint8_t addInstructions[addInstructionsTotal]
+    {
+        0b00000000, //Reg/memory with either register to either - 2pad
+        0b10000000, //immediate to register - 2pad
+        0b00000100, //immediate to acculator - 1pad
+    };
+};
+
+struct Sub
+{
+    const char* instructionName = "sub";
+    uint8_t reg;
+    bool d;
+    bool w; //use wide registers or/and wide data.
+    bool s; //sign extend to 8bit to 16bit if w = 1
+
+    enum SubInstructionsType : uint8_t
+    {
+        REG_MEMORY_WITH_TO_EITHER = 0b00101000, //Reg/memory with either register to either - 2pad
+        IMMIDATE_FROM_REG_MEMORY =  0b10000000, //immediate from register - 2pad
+        IMMIDATE_FROM_ACCUMULATOR = 0b00101100,   //immediate from acculator - 1pad
+    };
+
+    SubInstructionsType types;
+
+    static constexpr uint8_t subInstructionsMask[subInstructionsTotal]
+    {
+        0b11111100, //Reg/memory with either register - 2pad
+        0b11111100, //immediate from register - 2pad
+        0b11111110, //immediate from acculator - 1pad
+    };
+
+    static constexpr uint8_t subInstructions[subInstructionsTotal]
+    {
+        0b00101000, //Reg/memory with either register - 2pad
+        0b10000000, //immediate from register - 2pad
+        0b00101100, //immediate from acculator - 1pad
+    };
+};
+
+struct Cmp
+{
+    const char* instructionName = "cmp";
+    uint8_t reg;
+    bool d;
+    bool w; //use wide registers or/and wide data.
+    bool s; //sign extend to 8bit to 16bit if w = 1
+
+    enum CpmInstructionsType : uint8_t
+    {
+        REG_MEMORY_AND_REG = 0b00111000, //Reg/memory and register - 2pad
+        IMMIDATE_WITH_REG_MEMORY = 0b10000000, //immediate with register - 2pad
+        IMMIDATE_WITH_ACCUMULATOR = 0b00111100,   //immediate with acculator - 1pad
+    };
+
+    CpmInstructionsType types;
+
+    static constexpr uint8_t cmpInstructionsMask[cmpInstructionsTotal]
+    {
+        0b11111100, //Reg/memory and register - 2pad
+        0b11111100, //immediate with register - 2pad
+        0b11111110, //immediate with acculator - 1pad
+    };
+
+    static constexpr uint8_t cmpInstructions[cmpInstructionsTotal]
+    {
+        0b00111000, //Reg/memory and register - 2pad
+        0b10000000, //immediate with register - 2pad
+        0b00111100, //immediate with acculator - 1pad
+    };
+};
+
 //These two arrays need to be coupled together. Meaning they need to match instruction type to instruction total.
 static const uint8_t* instructionsList[instructionsTotal]
 {
     Push::pushInstructions,
     Move::moveInstructions,
+    Add::addInstructions,
+    Sub::subInstructions,
+    Cmp::cmpInstructions,
 };
 
 //These two arrays need to be coupled together. Meaning they need to match instruction type to instruction total.
@@ -121,18 +223,27 @@ static const uint8_t* instructionsListMask[instructionsTotal]
 {
     Push::pushInstructionsMask,
     Move::moveInstructionsMask,
+    Add::addInstructionsMask,
+    Sub::subInstructionsMask,
+    Cmp::cmpInstructionsMask,
 };
 
 static uint32_t instructionListSize[instructionsTotal]
 {
     pushInstructionsTotal,
     moveInstructionsTotal,
+    addInstructionsTotal,
+    subInstructionsTotal,
+    cmpInstructionsTotal,
 };
 
 enum instructionType : uint8_t
 {
     PUSH,
     MOV,
+    ADD,
+    SUB,
+    CMP,
     COUNT,
 };
 
@@ -141,6 +252,9 @@ struct OpCodes
     instructionType type;
     Push push;
     Move move;
+    Add add;
+    Sub sub;
+    Cmp cmp;
 };
 
 static void printBinary1(char num)
@@ -204,6 +318,33 @@ static const char* getEffectiveAddressCalculation(uint8_t byte)
     uint8_t rmMask = 0b00000111;
     uint8_t rm = rmMask & byte;
     return effectiveAddressCalculations[rm];
+}
+
+static uint16_t signExtend(const char* const data, uint32_t &currentByte, bool isSigned)
+{
+    uint16_t value;
+    //If the s has been set I'm going to assume it's a signed number because how can you sign extend a non-signed number...
+    if (isSigned)
+    {
+        uint8_t signExtendMask = 0b10000000;
+        bool isNegative = (data[currentByte] & signExtendMask);
+        if (isNegative)
+        {
+            uint16_t nonNegativeMask = 0b1111111111111111;
+            value = data[currentByte] & nonNegativeMask;
+        }
+        else
+        {
+            uint16_t nonNegativeMask = 0b0000000011111111;
+            value = data[currentByte] & nonNegativeMask;
+        }
+    }
+    else
+    {
+        value = get16BitValue(data, currentByte);
+    }
+
+    return value;
 }
 
 #endif // !CPU_DATA_HDR
