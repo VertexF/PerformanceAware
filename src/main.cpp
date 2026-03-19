@@ -22,8 +22,7 @@ int main()
 
     HeapAllocator* allocator = &MemoryService::instance()->systemAllocator;
     StackAllocator scratchAllocator = MemoryService::instance()->scratchAllocator;
-    FileReadResult fileInput = fileReadBinary("C:\\Users\\Unga\\Documents\\nasmTest", &scratchAllocator);
-    //FileReadResult fileInput = fileReadBinary(BaseFilePath"\\computer_enhance\\perfaware\\part1\\listing_0041_add_sub_cmp_jnz", &scratchAllocator);
+    FileReadResult fileInput = fileReadBinary(BaseFilePath"\\computer_enhance\\perfaware\\part1\\listing_0041_add_sub_cmp_jnz", &scratchAllocator);
     char* data = fileInput.data;
 
     uint32_t currentByte = 0;
