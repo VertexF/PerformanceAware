@@ -17,37 +17,60 @@ set(VENDER_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/vender")
 set(SRC_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(PART1_HOMEWORK_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/computer_enhance/perfaware/part1")
 
-set(HOMEWORK_SOURCE src/main.cpp src/CPUData.hpp
-src/GroupInstructions.hpp
-src/GroupInstructions.cpp
-src/MoveInstruction.hpp
-src/MoveInstruction.cpp
-src/AddInstruction.hpp
-src/AddInstruction.cpp
-src/SubInstruction.hpp
-src/SubInstruction.cpp
-src/CmpInstruction.hpp
-src/CmpInstruction.cpp
-src/JnzInstruction.hpp
-src/JnzInstruction.cpp)
+set(8086DECODER_SOURCE 
+src/8086Decoder/main.cpp
+src/8086Decoder/CPUData.hpp
+src/8086Decoder/GroupInstructions.hpp
+src/8086Decoder/GroupInstructions.cpp
+src/8086Decoder/MoveInstruction.hpp
+src/8086Decoder/MoveInstruction.cpp
+src/8086Decoder/AddInstruction.hpp
+src/8086Decoder/AddInstruction.cpp
+src/8086Decoder/SubInstruction.hpp
+src/8086Decoder/SubInstruction.cpp
+src/8086Decoder/CmpInstruction.hpp
+src/8086Decoder/CmpInstruction.cpp
+src/8086Decoder/JnzInstruction.hpp
+src/8086Decoder/JnzInstruction.cpp)
 
-add_executable(Homework ${HOMEWORK_SOURCE})
+add_executable(8086Decoder ${8086DECODER_SOURCE})
 
 if (WIN32)
-    target_compile_definitions(Homework PRIVATE
+    target_compile_definitions(8086Decoder PRIVATE
                                _CRT_SECURE_NO_WARNINGS
                                WIN32_LEAN_AND_MEAN
                                NOMINMAX)
 endif()
 
-target_include_directories(Homework SYSTEM PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}
+target_include_directories(8086Decoder SYSTEM PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}
                                                ${SRC_INCLUDE}
                                                ${RAPID_HASH_DIR}
                                                ${TLSF_INCLUDE_DIR}
                                                ${VENDER_INCLUDE}
                                                ${PART1_HOMEWORK_INCLUDE})
 
-target_compile_definitions(Homework PUBLIC BaseFilePath="${CMAKE_CURRENT_SOURCE_DIR}")
+target_compile_definitions(8086Decoder PUBLIC BaseFilePath="${CMAKE_CURRENT_SOURCE_DIR}")
+
+set(CPUSIM_SOURCE 
+src/CPUSimulator/main.cpp)
+
+add_executable(CPUSimulator ${CPUSIM_SOURCE})
+
+if (WIN32)
+    target_compile_definitions(CPUSimulator PRIVATE
+                               _CRT_SECURE_NO_WARNINGS
+                               WIN32_LEAN_AND_MEAN
+                               NOMINMAX)
+endif()
+
+target_include_directories(CPUSimulator SYSTEM PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}
+                                               ${SRC_INCLUDE}
+                                               ${RAPID_HASH_DIR}
+                                               ${TLSF_INCLUDE_DIR}
+                                               ${VENDER_INCLUDE}
+                                               ${PART1_HOMEWORK_INCLUDE})
+
+target_compile_definitions(CPUSimulator PUBLIC BaseFilePath="${CMAKE_CURRENT_SOURCE_DIR}")
 
 set(FOUNDATION_SOURCE src/Foundation/Array.hpp
                       src/Foundation/Assert.hpp
@@ -102,7 +125,7 @@ target_include_directories(Foundation SYSTEM PRIVATE
                            ${VENDOR_INCLUDE})
 
 if (UNIX)
-    target_link_libraries(Homework PRIVATE
+    target_link_libraries(8086Decoder PRIVATE
                           dl
                           pthread)
 endif()
@@ -124,15 +147,21 @@ if (UNIX)
                           dl)
 endif()
 
-target_link_libraries(Homework PRIVATE Foundation External)
+target_link_libraries(8086Decoder PRIVATE Foundation External)
+target_link_libraries(CPUSimulator PRIVATE Foundation External)
 
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${HOMEWORK_SOURCE} ${FOUNDATION_SOURCE})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${8086DECODER_SOURCE} ${CPUSIM_SOURCE} ${FOUNDATION_SOURCE})
 
-target_compile_options(Homework PRIVATE
+target_compile_options(8086Decoder PRIVATE
+                       $<$<CXX_COMPILER_ID:MSVC>:/W4>
+                       $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -pedantic>
+)
+
+target_compile_options(CPUSimulator PRIVATE
                        $<$<CXX_COMPILER_ID:MSVC>:/W4>
                        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -pedantic>
 )
 
 if(MSVC)
-    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Homework)
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT 8086Decoder)
 endif()
