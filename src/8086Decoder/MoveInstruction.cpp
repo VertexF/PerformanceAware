@@ -30,12 +30,12 @@ bool handleMoveInstruction(const Move& move, const char* const data, StringBuffe
             ++currentByte;
             if (move.w)
             {
-                uint16_t value = get16BitValue(data, currentByte);
+                int16_t value = get16BitValue(data, currentByte);
                 vprint(instructionStringBuffer.appendUseF("%s [%s], word %d\n", move.instructionName, effectiveAddress, value));
             }
             else
             {
-                uint8_t value = data[currentByte];
+                int8_t value = data[currentByte];
                 vprint(instructionStringBuffer.appendUseF("%s [%s], byte %d\n", move.instructionName, effectiveAddress, value));
             }
 
@@ -50,12 +50,12 @@ bool handleMoveInstruction(const Move& move, const char* const data, StringBuffe
             ++currentByte;
             if (move.w)
             {
-                uint16_t value = get16BitValue(data, currentByte);
+                int16_t value = get16BitValue(data, currentByte);
                 vprint(instructionStringBuffer.appendUseF("%s [%s + %d], word %d\n", move.instructionName, effectiveAddress, displacementValue, value));
             }
             else
             {
-                uint8_t value = data[currentByte];
+                int8_t value = data[currentByte];
                 vprint(instructionStringBuffer.appendUseF("%s [%s + %d], byte %d\n", move.instructionName, effectiveAddress, displacementValue, value));
             }
 
@@ -70,12 +70,12 @@ bool handleMoveInstruction(const Move& move, const char* const data, StringBuffe
             ++currentByte;
             if (move.w)
             {
-                uint16_t value = get16BitValue(data, currentByte);
+                int16_t value = get16BitValue(data, currentByte);
                 vprint(instructionStringBuffer.appendUseF("%s [%s + %d], word %d\n", move.instructionName, effectiveAddress, displacementValue, value));
             }
             else
             {
-                uint8_t value = data[++currentByte];
+                int8_t value = data[++currentByte];
                 vprint(instructionStringBuffer.appendUseF("%s [%s + %d], byte %d\n", move.instructionName, effectiveAddress, displacementValue, value));
             }
 
@@ -170,12 +170,12 @@ bool handleMoveInstruction(const Move& move, const char* const data, StringBuffe
         const char* reg = registerTable[move.w][move.reg];
         if (move.w)
         {
-            uint16_t value = get16BitValue(data, currentByte);
+            int16_t value = get16BitValue(data, currentByte);
             vprint(instructionStringBuffer.appendUseF("%s %s, %d\n", move.instructionName, reg, value));
         }
         else
         {
-            uint8_t value = data[currentByte];
+            int8_t value = data[currentByte];
             vprint(instructionStringBuffer.appendUseF("%s %s, %d\n", move.instructionName, reg, value));
         }
 
@@ -186,12 +186,12 @@ bool handleMoveInstruction(const Move& move, const char* const data, StringBuffe
     {
         if (move.w)
         {
-            uint16_t value = get16BitValue(data, currentByte);
+            int16_t value = get16BitValue(data, currentByte);
             vprint(instructionStringBuffer.appendUseF("%s ax, [%d]\n", move.instructionName, value));
         }
         else
         {
-            uint16_t value = data[currentByte];
+            int16_t value = data[currentByte];
             vprint(instructionStringBuffer.appendUseF("%s ax, [%d]\n", move.instructionName, value));
         }
 
@@ -202,12 +202,12 @@ bool handleMoveInstruction(const Move& move, const char* const data, StringBuffe
     {
         if (move.w)
         {
-            uint16_t value = get16BitValue(data, currentByte);
+            int16_t value = get16BitValue(data, currentByte);
             vprint(instructionStringBuffer.appendUseF("%s [%d], ax\n", move.instructionName, value));
         }
         else
         {
-            uint16_t value = data[currentByte];
+            int16_t value = data[currentByte];
             vprint(instructionStringBuffer.appendUseF("%s [%d], ax\n", move.instructionName, value));
         }
         

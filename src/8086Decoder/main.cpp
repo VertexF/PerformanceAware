@@ -17,13 +17,22 @@
 int main() 
 {
     //Init services
-    MemoryService::instance()->init(void_giga(1ull), void_mega(8));
+    MemoryService::instance()->init(void_mega(256), void_mega(4));
     timeServiceInit();
 
     HeapAllocator* allocator = &MemoryService::instance()->systemAllocator;
     StackAllocator scratchAllocator = MemoryService::instance()->scratchAllocator;
-    FileReadResult fileInput = fileReadBinary(BaseFilePath"\\computer_enhance\\perfaware\\part1\\listing_0041_add_sub_cmp_jnz", &scratchAllocator);
+    FileReadResult fileInput = fileReadBinary(BaseFilePath"\\computer_enhance\\perfaware\\part1\\listing_0039_more_movs", &scratchAllocator);
+    //FileReadResult fileInput = fileReadBinary("justAdd", &scratchAllocator);
     char* data = fileInput.data;
+
+    //printBinary1(data[0]);
+    //printBinary1(data[1]);
+    //printBinary1(data[2]);
+    //vprint("-------\n");
+    //printBinary1(data[3]);
+    //printBinary1(data[4]);
+    //printBinary1(data[5]);
 
     uint32_t currentByte = 0;
 

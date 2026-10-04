@@ -106,11 +106,9 @@ set(FOUNDATION_SOURCE src/Foundation/Array.hpp
 )
 add_library(Foundation STATIC ${FOUNDATION_SOURCE})
 
-target_compile_definitions(Foundation PRIVATE
-                                      _CRT_SECURE_NO_WARNINGS)
-
 if(WIN32)
     target_compile_definitions(Foundation PRIVATE
+                                          _CRT_SECURE_NO_WARNINGS
                                           WIN32_LEAN_AND_MEAN
                                           NOMINMAX)
 endif()

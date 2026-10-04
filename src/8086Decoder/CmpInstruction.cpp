@@ -109,16 +109,15 @@ bool handleCmpInstruction(const Cmp& cmp, const char* const data, StringBuffer& 
             currentByte++;
             if (cmp.w)
             {
-                uint16_t value;
                 //If the s has been set I'm going to assume it's a signed number because how can you sign extend a non-signed number...
-                value = signExtend(data, currentByte, cmp.s);
+                int16_t value = signExtend(data, currentByte, cmp.s);
                 vprint(instructionStringBuffer.appendUseF("%s %s, %d\n", cmp.instructionName, reg, value));
 
                 return true;
             }
             else
             {
-                uint8_t value = data[currentByte];
+                int8_t value = data[currentByte];
                 vprint(instructionStringBuffer.appendUseF("%s %s, %d\n", cmp.instructionName, reg, value));
                 return true;
             }
@@ -136,12 +135,12 @@ bool handleCmpInstruction(const Cmp& cmp, const char* const data, StringBuffer& 
                 ++currentByte;
                 if (cmp.w)
                 {
-                    uint16_t value = signExtend(data, currentByte, cmp.s);
+                    int16_t value = signExtend(data, currentByte, cmp.s);
                     vprint(instructionStringBuffer.appendUseF("%s [%d], word %d\n", cmp.instructionName, displacementValue, value));
                 }
                 else
                 {
-                    uint8_t value = data[currentByte];
+                    int8_t value = data[currentByte];
                     vprint(instructionStringBuffer.appendUseF("%s [%d], byte %d\n", cmp.instructionName, displacementValue, value));
                 }
 
@@ -154,12 +153,12 @@ bool handleCmpInstruction(const Cmp& cmp, const char* const data, StringBuffer& 
             ++currentByte;
             if (cmp.w)
             {
-                uint16_t value = signExtend(data, currentByte, cmp.s);
+                int16_t value = signExtend(data, currentByte, cmp.s);
                 vprint(instructionStringBuffer.appendUseF("%s [%s], word %d\n", cmp.instructionName, effectiveAddress, value));
             }
             else
             {
-                uint8_t value = data[currentByte];
+                int8_t value = data[currentByte];
                 vprint(instructionStringBuffer.appendUseF("%s [%s], byte %d\n", cmp.instructionName, effectiveAddress, value));
             }
 
@@ -169,26 +168,6 @@ bool handleCmpInstruction(const Cmp& cmp, const char* const data, StringBuffer& 
         {
             uint8_t rmMask = 0b00000111;
             uint8_t rm = rmMask & data[currentByte];
-            if (rm == 0b00000110)
-            {
-                const char* reg = getRegister(data[currentByte], cmp.w, 0b00111000);
-                uint16_t displacementValue = get16BitDisplacement(data, currentByte);
-
-                //We need to do this to add off the displacementValue.
-                ++currentByte;
-                if (cmp.w)
-                {
-                    uint16_t value = signExtend(data, currentByte, cmp.s);
-                    vprint(instructionStringBuffer.appendUseF("%s [%d], word %d\n", cmp.instructionName, displacementValue, value));
-                }
-                else
-                {
-                    uint8_t value = data[currentByte];
-                    vprint(instructionStringBuffer.appendUseF("%s [%d], byte %d\n", cmp.instructionName, displacementValue, value));
-                }
-
-                return true;
-            }
             const char* effectiveAddress = effectiveAddressCalculations[rm];
             uint16_t displacementValue = data[++currentByte];
 
@@ -196,12 +175,12 @@ bool handleCmpInstruction(const Cmp& cmp, const char* const data, StringBuffer& 
             ++currentByte;
             if (cmp.w)
             {
-                uint16_t value = signExtend(data, currentByte, cmp.s);
+                int16_t value = signExtend(data, currentByte, cmp.s);
                 vprint(instructionStringBuffer.appendUseF("%s [%s + %d], word %d\n", cmp.instructionName, effectiveAddress, displacementValue, value));
             }
             else
             {
-                uint8_t value = data[currentByte];
+                int8_t value = data[currentByte];
                 vprint(instructionStringBuffer.appendUseF("%s [%s + %d], byte %d\n", cmp.instructionName, effectiveAddress, displacementValue, value));
             }
 
@@ -211,26 +190,6 @@ bool handleCmpInstruction(const Cmp& cmp, const char* const data, StringBuffer& 
         {
             uint8_t rmMask = 0b00000111;
             uint8_t rm = rmMask & data[currentByte];
-            if (rm == 0b00000110)
-            {
-                const char* reg = getRegister(data[currentByte], cmp.w, 0b00111000);
-                uint16_t displacementValue = get16BitDisplacement(data, currentByte);
-
-                //We need to do this to add off the displacementValue.
-                ++currentByte;
-                if (cmp.w)
-                {
-                    uint16_t value = signExtend(data, currentByte, cmp.s);
-                    vprint(instructionStringBuffer.appendUseF("%s [%d], word %d\n", cmp.instructionName, displacementValue, value));
-                }
-                else
-                {
-                    uint8_t value = data[currentByte];
-                    vprint(instructionStringBuffer.appendUseF("%s [%d], byte %d\n", cmp.instructionName, displacementValue, value));
-                }
-
-                return true;
-            }
             const char* effectiveAddress = effectiveAddressCalculations[rm];
             uint16_t displacementValue = get16BitDisplacement(data, currentByte);
 
@@ -238,12 +197,12 @@ bool handleCmpInstruction(const Cmp& cmp, const char* const data, StringBuffer& 
             ++currentByte;
             if (cmp.w)
             {
-                uint16_t value = signExtend(data, currentByte, cmp.s);
+                int16_t value = signExtend(data, currentByte, cmp.s);
                 vprint(instructionStringBuffer.appendUseF("%s [%s + %d], word %d\n", cmp.instructionName, effectiveAddress, displacementValue, value));
             }
             else
             {
-                uint8_t value = data[currentByte];
+                int8_t value = data[currentByte];
                 vprint(instructionStringBuffer.appendUseF("%s [%s + %d], byte %d\n", cmp.instructionName, effectiveAddress, displacementValue, value));
             }
 
@@ -255,12 +214,12 @@ bool handleCmpInstruction(const Cmp& cmp, const char* const data, StringBuffer& 
     {
         if (cmp.w)
         {
-            uint16_t value = get16BitValue(data, currentByte);
+            int16_t value = get16BitValue(data, currentByte);
             vprint(instructionStringBuffer.appendUseF("%s ax, %d\n", cmp.instructionName, value));
         }
         else
         {
-            uint8_t value = data[currentByte];
+            int8_t value = data[currentByte];
             vprint(instructionStringBuffer.appendUseF("%s al, %d\n", cmp.instructionName, value));
         }
         return true;

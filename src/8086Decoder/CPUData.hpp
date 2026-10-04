@@ -320,9 +320,9 @@ static const char* getEffectiveAddressCalculation(uint8_t byte)
     return effectiveAddressCalculations[rm];
 }
 
-static uint16_t signExtend(const char* const data, uint32_t &currentByte, bool isSigned)
+static int16_t signExtend(const char* const data, uint32_t &currentByte, bool isSigned)
 {
-    uint16_t value;
+    int16_t value;
     //If the s has been set I'm going to assume it's a signed number because how can you sign extend a non-signed number...
     if (isSigned)
     {
@@ -342,6 +342,33 @@ static uint16_t signExtend(const char* const data, uint32_t &currentByte, bool i
     else
     {
         value = get16BitValue(data, currentByte);
+    }
+
+    return value;
+}
+
+static int8_t signExtend8Bit(const char* const data, uint32_t& currentByte, bool isSigned)
+{
+    int8_t value;
+    //If the s has been set I'm going to assume it's a signed number because how can you sign extend a non-signed number...
+    if (isSigned)
+    {
+        uint8_t signExtendMask = 0b10000000;
+        bool isNegative = (data[currentByte] & signExtendMask);
+        if (isNegative)
+        {
+            uint8_t nonNegativeMask = 0b11111111;
+            value = data[currentByte] & nonNegativeMask;
+        }
+        else
+        {
+            uint16_t nonNegativeMask = 0b00000000;
+            value = data[currentByte] & nonNegativeMask;
+        }
+    }
+    else
+    {
+        value = data[currentByte];
     }
 
     return value;

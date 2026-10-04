@@ -109,14 +109,13 @@ bool handleAddInstruction(const Add& add, const char* const data, StringBuffer& 
             currentByte++;
             if (add.w)
             {
-                uint16_t value = signExtend(data, currentByte, add.s);
+                int16_t value = signExtend(data, currentByte, add.s);
                 vprint(instructionStringBuffer.appendUseF("%s %s, %d\n", add.instructionName, reg, value));
-
                 return true;
             }
             else
             {
-                uint8_t value = data[currentByte];
+                int8_t value = data[currentByte];
                 vprint(instructionStringBuffer.appendUseF("%s %s, %d\n", add.instructionName, reg, value));
                 return true;
             }
@@ -134,12 +133,12 @@ bool handleAddInstruction(const Add& add, const char* const data, StringBuffer& 
                 ++currentByte;
                 if (add.w)
                 {
-                    uint16_t value = signExtend(data, currentByte, add.s);
+                    int16_t value = signExtend(data, currentByte, add.s);
                     vprint(instructionStringBuffer.appendUseF("%s [%d], word %d\n", add.instructionName, displacementValue, value));
                 }
                 else
                 {
-                    uint8_t value = data[currentByte];
+                    int8_t value = data[currentByte];
                     vprint(instructionStringBuffer.appendUseF("%s [%d], byte %d\n", add.instructionName, displacementValue, value));
                 }
 
@@ -150,12 +149,12 @@ bool handleAddInstruction(const Add& add, const char* const data, StringBuffer& 
             ++currentByte;
             if (add.w)
             {
-                uint16_t value = get16BitValue(data, currentByte);
+                int16_t value = get16BitValue(data, currentByte);
                 vprint(instructionStringBuffer.appendUseF("%s [%s], word %d\n", add.instructionName, effectiveAddress, value));
             }
             else
             {
-                uint8_t value = data[currentByte];
+                int8_t value = data[currentByte];
                 vprint(instructionStringBuffer.appendUseF("%s [%s], byte %d\n", add.instructionName, effectiveAddress, value));
             }
 
@@ -165,26 +164,6 @@ bool handleAddInstruction(const Add& add, const char* const data, StringBuffer& 
         {
             uint8_t rmMask = 0b00000111;
             uint8_t rm = rmMask & data[currentByte];
-            if (rm == 0b00000110)
-            {
-                const char* reg = getRegister(data[currentByte], add.w, 0b00111000);
-                uint16_t displacementValue = get16BitDisplacement(data, currentByte);
-
-                //We need to do this to add off the displacementValue.
-                ++currentByte;
-                if (add.w)
-                {
-                    uint16_t value = signExtend(data, currentByte, add.s);
-                    vprint(instructionStringBuffer.appendUseF("%s [%d], word %d\n", add.instructionName, displacementValue, value));
-                }
-                else
-                {
-                    uint8_t value = data[currentByte];
-                    vprint(instructionStringBuffer.appendUseF("%s [%d], byte %d\n", add.instructionName, displacementValue, value));
-                }
-
-                return true;
-            }
             const char* effectiveAddress = effectiveAddressCalculations[rm];
             uint16_t displacementValue = data[++currentByte];
 
@@ -192,12 +171,12 @@ bool handleAddInstruction(const Add& add, const char* const data, StringBuffer& 
             ++currentByte;
             if (add.w)
             {
-                uint16_t value = signExtend(data, currentByte, add.s);
+                int16_t value = signExtend(data, currentByte, add.s);
                 vprint(instructionStringBuffer.appendUseF("%s [%s + %d], word %d\n", add.instructionName, effectiveAddress, displacementValue, value));
             }
             else
             {
-                uint8_t value = data[currentByte];
+                int8_t value = data[currentByte];
                 vprint(instructionStringBuffer.appendUseF("%s [%s + %d], byte %d\n", add.instructionName, effectiveAddress, displacementValue, value));
             }
 
@@ -207,26 +186,6 @@ bool handleAddInstruction(const Add& add, const char* const data, StringBuffer& 
         {
             uint8_t rmMask = 0b00000111;
             uint8_t rm = rmMask & data[currentByte];
-            if (rm == 0b00000110)
-            {
-                const char* reg = getRegister(data[currentByte], add.w, 0b00111000);
-                uint16_t displacementValue = get16BitDisplacement(data, currentByte);
-
-                //We need to do this to add off the displacementValue.
-                ++currentByte;
-                if (add.w)
-                {
-                    uint16_t value = signExtend(data, currentByte, add.s);
-                    vprint(instructionStringBuffer.appendUseF("%s [%d], word %d\n", add.instructionName, displacementValue, value));
-                }
-                else
-                {
-                    uint8_t value = data[currentByte];
-                    vprint(instructionStringBuffer.appendUseF("%s [%d], byte %d\n", add.instructionName, displacementValue, value));
-                }
-
-                return true;
-            }
             const char* effectiveAddress = effectiveAddressCalculations[rm];
             uint16_t displacementValue = get16BitDisplacement(data, currentByte);
 
@@ -234,12 +193,12 @@ bool handleAddInstruction(const Add& add, const char* const data, StringBuffer& 
             ++currentByte;
             if (add.w)
             {
-                uint16_t value = signExtend(data, currentByte, add.s);
+                int16_t value = signExtend(data, currentByte, add.s);
                 vprint(instructionStringBuffer.appendUseF("%s [%s + %d], word %d\n", add.instructionName, effectiveAddress, displacementValue, value));
             }
             else
             {
-                uint8_t value = data[currentByte];
+                int8_t value = data[currentByte];
                 vprint(instructionStringBuffer.appendUseF("%s [%s + %d], byte %d\n", add.instructionName, effectiveAddress, displacementValue, value));
             }
 
@@ -251,12 +210,12 @@ bool handleAddInstruction(const Add& add, const char* const data, StringBuffer& 
     {
         if (add.w)
         {
-            uint16_t value = get16BitValue(data, currentByte);
+            int16_t value = get16BitValue(data, currentByte);
             vprint(instructionStringBuffer.appendUseF("%s ax, %d\n", add.instructionName, value));
         }
         else
         {
-            uint8_t value = data[currentByte];
+            int8_t value = data[currentByte];
             vprint(instructionStringBuffer.appendUseF("%s al, %d\n", add.instructionName, value));
         }
         return true;
