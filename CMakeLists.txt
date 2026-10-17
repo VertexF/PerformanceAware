@@ -31,7 +31,9 @@ src/8086Decoder/SubInstruction.cpp
 src/8086Decoder/CmpInstruction.hpp
 src/8086Decoder/CmpInstruction.cpp
 src/8086Decoder/JnzInstruction.hpp
-src/8086Decoder/JnzInstruction.cpp)
+src/8086Decoder/JnzInstruction.cpp
+src/8086Decoder/Registers.hpp
+)
 
 add_executable(8086Decoder ${8086DECODER_SOURCE})
 
@@ -50,27 +52,6 @@ target_include_directories(8086Decoder SYSTEM PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR
                                                ${PART1_HOMEWORK_INCLUDE})
 
 target_compile_definitions(8086Decoder PUBLIC BaseFilePath="${CMAKE_CURRENT_SOURCE_DIR}")
-
-set(CPUSIM_SOURCE 
-src/CPUSimulator/main.cpp)
-
-add_executable(CPUSimulator ${CPUSIM_SOURCE})
-
-if (WIN32)
-    target_compile_definitions(CPUSimulator PRIVATE
-                               _CRT_SECURE_NO_WARNINGS
-                               WIN32_LEAN_AND_MEAN
-                               NOMINMAX)
-endif()
-
-target_include_directories(CPUSimulator SYSTEM PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}
-                                               ${SRC_INCLUDE}
-                                               ${RAPID_HASH_DIR}
-                                               ${TLSF_INCLUDE_DIR}
-                                               ${VENDER_INCLUDE}
-                                               ${PART1_HOMEWORK_INCLUDE})
-
-target_compile_definitions(CPUSimulator PUBLIC BaseFilePath="${CMAKE_CURRENT_SOURCE_DIR}")
 
 set(FOUNDATION_SOURCE src/Foundation/Array.hpp
                       src/Foundation/Assert.hpp
@@ -146,16 +127,10 @@ if (UNIX)
 endif()
 
 target_link_libraries(8086Decoder PRIVATE Foundation External)
-target_link_libraries(CPUSimulator PRIVATE Foundation External)
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${8086DECODER_SOURCE} ${CPUSIM_SOURCE} ${FOUNDATION_SOURCE})
 
 target_compile_options(8086Decoder PRIVATE
-                       $<$<CXX_COMPILER_ID:MSVC>:/W4>
-                       $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -pedantic>
-)
-
-target_compile_options(CPUSimulator PRIVATE
                        $<$<CXX_COMPILER_ID:MSVC>:/W4>
                        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -pedantic>
 )

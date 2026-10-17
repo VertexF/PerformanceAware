@@ -13,26 +13,24 @@
 #include "CmpInstruction.hpp"
 #include "JnzInstruction.hpp"
 #include "GroupInstructions.hpp"
+#include "Registers.hpp"
 
 int main() 
 {
+    //Setting up the registers with max values so I see if the value has correctly been updated.
+    for (uint32_t i = 0; i < 8; ++i)
+    {
+        registers[i] = INT16_MAX;
+    }
     //Init services
     MemoryService::instance()->init(void_mega(256), void_mega(4));
     timeServiceInit();
 
     HeapAllocator* allocator = &MemoryService::instance()->systemAllocator;
     StackAllocator scratchAllocator = MemoryService::instance()->scratchAllocator;
-    FileReadResult fileInput = fileReadBinary(BaseFilePath"\\computer_enhance\\perfaware\\part1\\listing_0039_more_movs", &scratchAllocator);
+    FileReadResult fileInput = fileReadBinary(BaseFilePath"\\computer_enhance\\perfaware\\part1\\listing_0044_register_movs", &scratchAllocator);
     //FileReadResult fileInput = fileReadBinary("justAdd", &scratchAllocator);
     char* data = fileInput.data;
-
-    //printBinary1(data[0]);
-    //printBinary1(data[1]);
-    //printBinary1(data[2]);
-    //vprint("-------\n");
-    //printBinary1(data[3]);
-    //printBinary1(data[4]);
-    //printBinary1(data[5]);
 
     uint32_t currentByte = 0;
 

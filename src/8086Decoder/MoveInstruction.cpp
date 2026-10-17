@@ -3,6 +3,8 @@
 #include "Foundation/Log.hpp"
 #include "Foundation/Assert.hpp"
 
+#include "Registers.hpp"
+
 namespace 
 {
     constexpr uint8_t modMask = 0b11000000; //mask
@@ -94,10 +96,34 @@ bool handleMoveInstruction(const Move& move, const char* const data, StringBuffe
             if (move.d)
             {
                 vprint(instructionStringBuffer.appendUseF("%s %s, %s\n", move.instructionName, firstRegister, secondRegister));
+
+                uint8_t destRegisterIndex = (data[currentByte] & 0b00111000) >> 3;
+                uint8_t sourceRegisterIndex = (data[currentByte] & 0b00000111);
+                int16_t oldValue = registers[destRegisterIndex];
+                registers[destRegisterIndex] = registers[sourceRegisterIndex];
+
+                vprint(instructionStringBuffer.appendUseF("-- %s %s, 0x%x (%d) -> 0x%x (%d)\n",
+                    move.instructionName, firstRegister, secondRegister,
+                    oldValue,
+                    oldValue,
+                    registers[destRegisterIndex],
+                    registers[destRegisterIndex]));
             }
             else
             {
                 vprint(instructionStringBuffer.appendUseF("%s %s, %s\n", move.instructionName, secondRegister, firstRegister));
+
+                uint8_t sourceRegisterIndex = (data[currentByte] & 0b00111000) >> 3;
+                uint8_t destRegisterIndex = (data[currentByte] & 0b00000111);
+                int16_t oldValue = registers[destRegisterIndex];
+                registers[destRegisterIndex] = registers[sourceRegisterIndex];
+
+                vprint(instructionStringBuffer.appendUseF("-- %s %s, %s 0x%x (%d) -> 0x%x (%d)\n",
+                    move.instructionName, firstRegister, secondRegister,
+                    oldValue,
+                    oldValue,
+                    registers[destRegisterIndex],
+                    registers[destRegisterIndex]));
             }
 
             return true;
@@ -172,11 +198,43 @@ bool handleMoveInstruction(const Move& move, const char* const data, StringBuffe
         {
             int16_t value = get16BitValue(data, currentByte);
             vprint(instructionStringBuffer.appendUseF("%s %s, %d\n", move.instructionName, reg, value));
+            vprint(instructionStringBuffer.appendUseF("-- %s %s, 0x%x (%d) -> 0x%x (%d)\n", move.instructionName, reg, registers[move.reg],
+                                                                                                                       registers[move.reg], 
+                                                                                                                       value, value));
+            registers[move.reg] = value;
         }
         else
         {
             int8_t value = data[currentByte];
             vprint(instructionStringBuffer.appendUseF("%s %s, %d\n", move.instructionName, reg, value));
+            if (move.reg < 4) 
+            {
+                int16_t oldValue = registers[move.reg];
+                int16_t regValue = value;
+                //Note mask starts with a 1 because it's a signed value and we don't want to make a negative 16-bit number positive.
+                //Since we don't control the top part of the register with al, cl, dl and bl
+                registers[move.reg] = registers[move.reg] & 0b0111111100000000; //clears the bottom bit parts
+                registers[move.reg] = registers[move.reg] | regValue; //Add in the new bottom bits
+
+                vprint(instructionStringBuffer.appendUseF("-- %s %s, 0x%x (%d) -> 0x%x (%d)\n", 
+                                                          move.instructionName, reg, oldValue,
+                                                          oldValue,
+                                                          registers[move.reg],
+                                                          registers[move.reg]));
+            }
+            else 
+            {
+                int16_t oldValue = registers[move.reg];
+                int16_t regValue = value << 8;
+                registers[move.reg] = registers[move.reg] & 0b0000000011111111; //clears the top bit parts
+                registers[move.reg] = registers[move.reg] | regValue; //Add in the new bottom bits
+
+                vprint(instructionStringBuffer.appendUseF("-- %s %s, 0x%x (%d) -> 0x%x (%d)\n",
+                                                          move.instructionName, reg, oldValue,
+                                                          oldValue,
+                                                          registers[move.reg],
+                                                          registers[move.reg]));
+            }
         }
 
         return true;

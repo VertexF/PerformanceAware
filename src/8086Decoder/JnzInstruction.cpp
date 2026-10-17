@@ -31,7 +31,8 @@ void printJumpValue(const char* const data, StringBuffer& instructionStringBuffe
     uint32_t programPosition = currentByte;
     currentByte++;
     programPosition += data[currentByte];
-    vprint(instructionStringBuffer.appendUseF("%s, 0x%x\n", instructionName, programPosition));
+    //vprint(instructionStringBuffer.appendUseF("%s, 0x%x\n", instructionName, programPosition));
+    vprint(instructionStringBuffer.appendUseF("%s, %d\n", instructionName, (int8_t)data[currentByte]));
 }
 
 bool handleJnzInstruction(const char* const data, StringBuffer& instructionStringBuffer, uint32_t& currentByte)

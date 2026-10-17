@@ -302,12 +302,12 @@ static uint16_t get16BitDisplacement(const char* const data, uint32_t& currentBy
     return lowDisplacement | highDisplacement;
 }
 
-static uint16_t get16BitValue(const char* const data, uint32_t& currentByte)
+static int16_t get16BitValue(const char* const data, uint32_t& currentByte)
 {
     uint16_t lowValueMask = 0b0000000011111111;
-    uint16_t lowValue = data[currentByte] & lowValueMask;
+    int16_t lowValue = data[currentByte] & lowValueMask;
     currentByte++;
-    uint16_t highValue = data[currentByte];
+    int16_t highValue = data[currentByte];
 
     highValue = highValue << 8;
     return lowValue | highValue;
