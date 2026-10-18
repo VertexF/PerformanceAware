@@ -3,6 +3,8 @@
 
 #include <cstdint>
 
-inline int16_t registers[7]{INT16_MAX};
+inline int16_t registers[7]{0};
+inline bool zeroFlag = false;
+inline bool signedFlag = false;
 
 #endif // !REGISTERS_HDR

@@ -17,18 +17,13 @@
 
 int main() 
 {
-    //Setting up the registers with max values so I see if the value has correctly been updated.
-    for (uint32_t i = 0; i < 8; ++i)
-    {
-        registers[i] = INT16_MAX;
-    }
     //Init services
     MemoryService::instance()->init(void_mega(256), void_mega(4));
     timeServiceInit();
 
     HeapAllocator* allocator = &MemoryService::instance()->systemAllocator;
     StackAllocator scratchAllocator = MemoryService::instance()->scratchAllocator;
-    FileReadResult fileInput = fileReadBinary(BaseFilePath"\\computer_enhance\\perfaware\\part1\\listing_0044_register_movs", &scratchAllocator);
+    FileReadResult fileInput = fileReadBinary(BaseFilePath"\\computer_enhance\\perfaware\\part1\\listing_0046_add_sub_cmp", &scratchAllocator);
     //FileReadResult fileInput = fileReadBinary("justAdd", &scratchAllocator);
     char* data = fileInput.data;
 

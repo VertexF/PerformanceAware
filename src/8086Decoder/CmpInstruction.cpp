@@ -1,11 +1,12 @@
 #include "AddInstruction.hpp"
 
 #include "Foundation/Assert.hpp"
+#include "Registers.hpp"
 
 namespace
 {
     constexpr uint8_t modMask = 0b11000000; //mask
-    constexpr uint8_t registerToRegesterMove = 0b11000000; //register to register add
+    constexpr uint8_t registerToRegesterCmp = 0b11000000; //register to register add
     constexpr uint8_t noDisplacement = 0b00000000; //no displacement* (apart from when the R/M field is 110)
     constexpr uint8_t displacementBy8Bit = 0b01000000; //8-bit displacement for a effecitive address calculation
     constexpr uint8_t displacementBy16Bit = 0b10000000; //16-bit displacement for a effecitive address calculation
@@ -18,7 +19,7 @@ bool handleCmpInstruction(const Cmp& cmp, const char* const data, StringBuffer& 
     case Cmp::REG_MEMORY_AND_REG://Reg/memory and register - 2pad
     {
         uint8_t modField = data[currentByte] & modMask;
-        if (modField == registerToRegesterMove)
+        if (modField == registerToRegesterCmp)
         {
             const char* firstRegister = getRegister(data[currentByte], cmp.w, 0b00111000);
             const char* secondRegister = getRegister(data[currentByte], cmp.w, 0b00000111);
@@ -26,10 +27,66 @@ bool handleCmpInstruction(const Cmp& cmp, const char* const data, StringBuffer& 
             if (cmp.d)
             {
                 vprint(instructionStringBuffer.appendUseF("%s %s, %s\n", cmp.instructionName, firstRegister, secondRegister));
+
+                uint8_t destRegisterIndex = (data[currentByte] & 0b00111000) >> 3;
+                uint8_t sourceRegisterIndex = (data[currentByte] & 0b00000111);
+                int16_t oldValue = registers[destRegisterIndex];
+                int16_t tempCompare = registers[destRegisterIndex] - registers[sourceRegisterIndex];
+
+                char zeroChar = ' ';
+                char signedChar = ' ';
+                if (tempCompare == 0)
+                {
+                    zeroFlag = true;
+                    zeroChar = 'Z';
+                }
+
+                if (tempCompare & 0x8000)
+                {
+                    signedFlag = true;
+                    signedChar = 'S';
+                }
+
+                vprint(instructionStringBuffer.appendUseF("-- %s %s, %s 0x%x (%d) -> 0x%x (%d)",
+                    cmp.instructionName, firstRegister, secondRegister,
+                    oldValue,
+                    oldValue,
+                    tempCompare,
+                    tempCompare));
+
+                vprint(instructionStringBuffer.appendUseF(" Flags -> %c%c\n", zeroChar, signedChar));
             }
             else
             {
                 vprint(instructionStringBuffer.appendUseF("%s %s, %s\n", cmp.instructionName, secondRegister, firstRegister));
+
+                uint8_t sourceRegisterIndex = (data[currentByte] & 0b00111000) >> 3;
+                uint8_t destRegisterIndex = (data[currentByte] & 0b00000111);
+                int16_t oldValue = registers[destRegisterIndex];
+                int16_t tempCompare = registers[destRegisterIndex] - registers[sourceRegisterIndex];
+
+                char zeroChar = ' ';
+                char signedChar = ' ';
+                if (tempCompare == 0)
+                {
+                    zeroFlag = true;
+                    zeroChar = 'Z';
+                }
+
+                if (tempCompare & 0x8000)
+                {
+                    signedFlag = true;
+                    signedChar = 'S';
+                }
+
+                vprint(instructionStringBuffer.appendUseF("-- %s %s, %s 0x%x (%d) -> 0x%x (%d)",
+                    cmp.instructionName, firstRegister, secondRegister,
+                    oldValue,
+                    oldValue,
+                    tempCompare,
+                    tempCompare));
+
+                vprint(instructionStringBuffer.appendUseF(" Flags -> %c%c\n", zeroChar, signedChar));
             }
 
             return true;
@@ -102,7 +159,7 @@ bool handleCmpInstruction(const Cmp& cmp, const char* const data, StringBuffer& 
     {
         uint8_t modField = data[currentByte] & modMask;
 
-        if (modField == registerToRegesterMove)
+        if (modField == registerToRegesterCmp)
         {
             const char* reg = getRegister(data[currentByte], cmp.w, 0b00000111);
 
